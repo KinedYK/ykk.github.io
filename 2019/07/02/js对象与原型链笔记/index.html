@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>js对象与原型链笔记 | 哎呀呀的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="--理解js对象与原型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="js对象与原型链笔记">
+<meta property="og:url" content="https://kinedyk.github.io/2019/07/02/js对象与原型链笔记/index.html">
+<meta property="og:site_name" content="哎呀呀的博客">
+<meta property="og:description" content="--理解js对象与原型">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-02T10:45:28.011Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="js对象与原型链笔记">
+<meta name="twitter:description" content="--理解js对象与原型">
+  
+    <link rel="alternate" href="/ykk.github.io/atom.xml" title="哎呀呀的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/ykk.github.io/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/ykk.github.io/" id="logo">哎呀呀的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/ykk.github.io/">Home</a>
+        
+          <a class="main-nav-link" href="/ykk.github.io/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/ykk.github.io/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://kinedyk.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js对象与原型链笔记" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/ykk.github.io/2019/07/02/js对象与原型链笔记/" class="article-date">
+  <time datetime="2019-07-02T09:18:00.000Z" itemprop="datePublished">2019-07-02</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      js对象与原型链笔记
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p align="center">--理解js对象与原型</p>
+
+<a id="more"></a>
+
+<h3 id="创建对象的方式"><a href="#创建对象的方式" class="headerlink" title="创建对象的方式"></a>创建对象的方式</h3><ol>
+<li><p>创建一个对象，挂载属性和方法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> person = <span class="keyword">new</span> <span class="built_in">Object</span>()</span><br><span class="line">person.name = <span class="string">'yin'</span></span><br><span class="line">person.say = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  alert(<span class="keyword">this</span>.name)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>对象字面量方式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> person = &#123;</span><br><span class="line">  name: <span class="string">'yin'</span>,</span><br><span class="line">  say: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="keyword">this</span>.name)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>工厂模式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createdPerson</span>(<span class="params">name, age, job</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> o = <span class="keyword">new</span> <span class="built_in">Object</span>()</span><br><span class="line">  o.name = name</span><br><span class="line">  o.age = age</span><br><span class="line">  o.job = job</span><br><span class="line">  o.say = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="keyword">this</span>.name)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> person1 = createdPerson(<span class="string">'yin'</span>, <span class="number">12</span>, <span class="string">'it'</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>构造函数模式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params">name, age, job</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.name = name</span><br><span class="line">  <span class="keyword">this</span>.age = age</span><br><span class="line">  <span class="keyword">this</span>.job = job</span><br><span class="line">  <span class="keyword">this</span>.say = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="keyword">this</span>.name)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> person1 = <span class="keyword">new</span> Person(<span class="string">'yin'</span>, <span class="number">12</span>, <span class="string">'it'</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>原型模式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">Person.prototype.name = <span class="string">"yin"</span></span><br><span class="line">Person.prototype.age = <span class="number">29</span></span><br><span class="line">Person.prototype.job = <span class="string">"it"</span></span><br><span class="line">Person.prototype.say = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;alert(<span class="keyword">this</span>.name)&#125;</span><br><span class="line"><span class="keyword">var</span> person1 = <span class="keyword">new</span> Person()</span><br><span class="line">person1.say() <span class="comment">// yin</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h3 id="属性类型"><a href="#属性类型" class="headerlink" title="属性类型"></a>属性类型</h3><ol>
+<li><p>数据属性</p>
+<p>数据属性包含一个数据值的位置，在这个位置可以读取和写入值。数据属性有 4 个描述行为的特征。[configurable]，[enumerable]，[writable]，[value]</p>
+</li>
+<li><p>访问器属性</p>
+<p>访问器属性不包含数据值；它们包含一对 getter 和 setter 函数；getter 函数负责返回有效的值，</p>
+<p>setter 函数负责决定如何处理数据。访问器属性的 4 个特征。[configurable]，[enumerable]，[Get]，[Set]</p>
+</li>
+</ol>
+<h3 id="Object-defineProperty-方法"><a href="#Object-defineProperty-方法" class="headerlink" title="Object.defineProperty() 方法"></a>Object.defineProperty() 方法</h3><p>— — 要修改属性默认的特征，或定义访问器属性都只能通过 Object.defaultProperty()函数来操作</p>
+<ol>
+<li><p>Object.defineProperty(ObjectName, propertyName, desc)方法</p>
+<p>desc 可选属性：[configurable]，[enumerable]，[writable]，[value]</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 修改数据属性</span></span><br><span class="line"><span class="keyword">var</span> person = &#123;&#125;</span><br><span class="line"><span class="built_in">Object</span>.defineProperty(person, <span class="string">'name'</span>, &#123;</span><br><span class="line">  configurable: <span class="literal">false</span>,</span><br><span class="line">  value: <span class="string">'yin'</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义getter和setter</span></span><br><span class="line"><span class="keyword">var</span> book = &#123; <span class="attr">_year</span>: <span class="number">2004</span>, <span class="attr">edition</span>: <span class="number">1</span> &#125;</span><br><span class="line"><span class="built_in">Object</span>.defineProperty(book, <span class="string">'year'</span>, &#123;</span><br><span class="line">  <span class="keyword">get</span>: function() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>._year</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">set</span>: function(newVal) &#123;</span><br><span class="line">    <span class="keyword">if</span> (newVal &gt; <span class="number">2004</span>) &#123;</span><br><span class="line">      <span class="keyword">this</span>._year = newVal</span><br><span class="line">      <span class="keyword">this</span>.edition += newVal - <span class="number">2004</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line">book.year = <span class="number">2005</span></span><br><span class="line">alert(book.edition) <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h3 id="原型链"><a href="#原型链" class="headerlink" title="原型链"></a>原型链</h3>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kinedyk.github.io/2019/07/02/js对象与原型链笔记/" data-id="cjxlos0rn0002qw0bn24ee1d9" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/ykk.github.io/2019/07/02/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Hello World
+        
+      </div>
+    </a>
+  
+  
+    <a href="/ykk.github.io/2019/06/30/sass-笔记/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">sass 笔记</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/ykk.github.io/archives/2019/07/">七月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/ykk.github.io/archives/2019/06/">六月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/ykk.github.io/2019/07/02/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/ykk.github.io/2019/07/02/js对象与原型链笔记/">js对象与原型链笔记</a>
+          </li>
+        
+          <li>
+            <a href="/ykk.github.io/2019/06/30/sass-笔记/">sass 笔记</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Yin_kk<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/ykk.github.io/" class="mobile-nav-link">Home</a>
+  
+    <a href="/ykk.github.io/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/ykk.github.io/fancybox/jquery.fancybox.css">
+  <script src="/ykk.github.io/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/ykk.github.io/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
