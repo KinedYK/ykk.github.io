@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="哎呀呀的博客">
 <meta property="og:description" content="--理解js对象与原型">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-07-02T10:45:28.011Z">
+<meta property="og:updated_time" content="2019-07-03T04:04:35.428Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="js对象与原型链笔记">
 <meta name="twitter:description" content="--理解js对象与原型">
@@ -125,11 +125,17 @@
 
 </li>
 </ol>
-<h3 id="原型链"><a href="#原型链" class="headerlink" title="原型链"></a>原型链</h3>
+<h3 id="原型链"><a href="#原型链" class="headerlink" title="原型链"></a>原型链</h3><p>— — js中原型链作为实现继承的主要方法。其基本思想就是利用原型让一个引用类型继承另一个引用类型的属性和方法。</p>
+<ol>
+<li><p>构造函数，原型和实例的关系：</p>
+<p>每个构造函数（例：Array()）都有一个原型对象（Array.prototype），原型对象都包含一个指向构造函数的指针（Array.prototype.construct -&gt; Array()）,而实例包含一个指向原型对象的内部指针（var array = new Array(), [[prototype]] -&gt; Array.prototype）</p>
+</li>
+</ol>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://kinedyk.github.io/2019/07/02/js对象与原型链笔记/" data-id="cjxlov50b0001ss0bi197zjxh" class="article-share-link">Share</a>
+      <a data-url="https://kinedyk.github.io/2019/07/02/js对象与原型链笔记/" data-id="cjxmpw8070000fz0bamc1o05h" class="article-share-link">Share</a>
       
       
     </footer>
