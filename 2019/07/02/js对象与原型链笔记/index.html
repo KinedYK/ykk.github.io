@@ -5,19 +5,19 @@
   
 
   
-  <title>js对象与原型链笔记 | 哎呀呀的博客</title>
+  <title>哎呀呀的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="--理解js对象与原型">
-<meta name="keywords" content="object, 笔记">
+<meta name="keywords" content="笔记">
 <meta property="og:type" content="article">
-<meta property="og:title" content="js对象与原型链笔记">
+<meta property="og:title" content="哎呀呀的博客">
 <meta property="og:url" content="https://kinedyk.github.io/2019/07/02/js对象与原型链笔记/index.html">
 <meta property="og:site_name" content="哎呀呀的博客">
 <meta property="og:description" content="--理解js对象与原型">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-07-05T03:07:50.477Z">
+<meta property="og:updated_time" content="2019-07-28T03:05:47.127Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="js对象与原型链笔记">
+<meta name="twitter:title" content="哎呀呀的博客">
 <meta name="twitter:description" content="--理解js对象与原型">
   
     <link rel="alternate" href="/ykk.github.io/atom.xml" title="哎呀呀的博客" type="application/atom+xml">
@@ -75,20 +75,9 @@
   <div class="article-inner">
     
     
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      js对象与原型链笔记
-    </h1>
-  
-
-      </header>
-    
     <div class="article-entry" itemprop="articleBody">
       
         <p align="center">--理解js对象与原型</p>
-
 <a id="more"></a>
 
 <h3 id="创建对象的方式"><a href="#创建对象的方式" class="headerlink" title="创建对象的方式"></a>创建对象的方式</h3><ol>
@@ -132,14 +121,56 @@
 <p>每个构造函数（例：Array()）都有一个原型对象（Array.prototype），原型对象都包含一个指向构造函数的指针（Array.prototype.construct -&gt; Array()）,而实例包含一个指向原型对象的内部指针（var array = new Array(), [[prototype]] -&gt; Array.prototype）</p>
 </li>
 </ol>
+<h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><ol>
+<li><p>原型链继承：实质是重写原型对象</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span> (<span class="params"></span>) </span>&#123; <span class="comment">// 父类</span></span><br><span class="line">  <span class="keyword">this</span>.property = <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">SuperType.prototype.getSuperValue = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;<span class="keyword">return</span> <span class="keyword">this</span>.property&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.subproperty = <span class="literal">false</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 继承superType </span></span><br><span class="line">SubType.prototype = <span class="keyword">new</span> SuperType()</span><br><span class="line"></span><br><span class="line">SubType.prototype.getSubValue = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;<span class="keyword">return</span> <span class="keyword">this</span>.subproperty&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> instance = <span class="keyword">new</span> SubType()</span><br><span class="line"><span class="built_in">console</span>.log(instance.getSuperValue())</span><br></pre></td></tr></table></figure>
+
+<p>优：1. 所有实例都共享了原型的属性和方法。</p>
+<p>缺：1. 创建子类实例，无法向超类构造函数传值</p>
+<p>​        2. 共享的属性和实例若被修改，则不同的实例中都会访问到被修改的属性和方法</p>
+</li>
+<li><p>借用构造函数（伪造对象或经典继承）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params">name</span>) </span>&#123; <span class="comment">// 接受参数</span></span><br><span class="line">  <span class="keyword">this</span>.name = name</span><br><span class="line">  <span class="keyword">this</span>.colors = [<span class="string">'red'</span>,<span class="string">'green'</span>,<span class="string">'blue'</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 继承了SuperType </span></span><br><span class="line">  SuperType.call(<span class="keyword">this</span>, <span class="string">'ykk'</span>) <span class="comment">// 传参</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> instance1 = <span class="keyword">new</span> SubType()</span><br><span class="line">instance1.colors.push(<span class="string">'black'</span>)</span><br><span class="line"><span class="built_in">console</span>.log(instace1.colors) <span class="comment">// ['red','green','blue', 'black']</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> instance2 = <span class="keyword">new</span> SubType()</span><br><span class="line"><span class="built_in">console</span>.log(instance2.colors) <span class="comment">// ['red','green','blue']</span></span><br></pre></td></tr></table></figure>
+
+<p>优：1. 可在创建子类实例时向超类构造传值</p>
+<p>缺：1. 方法都在构造中定义，函数无可复用性。</p>
+<p>​    2. 在超类的原型中定义的方法在子类中是不可见的</p>
+<ol start="3">
+<li>instanceOf 不能识别基于借用构造函数继承的对象 </li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">instance1 instanceOf SubType <span class="comment">// true</span></span><br><span class="line">instance1 instanceOf SuperType <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>组合继承：结合 <code>原型链继承</code>和<code>经典继承</code>的优点</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params">name</span>) </span>&#123; <span class="comment">// 接受参数</span></span><br><span class="line">  <span class="keyword">this</span>.name = name</span><br><span class="line">  <span class="keyword">this</span>.colors = [<span class="string">'red'</span>,<span class="string">'green'</span>,<span class="string">'blue'</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">SuperType.prototype.sayName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>.name)&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span> (<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 继承属性</span></span><br><span class="line">  SuperType.call(<span class="keyword">this</span>, name) <span class="comment">// 传参 // 第二次调用</span></span><br><span class="line">  <span class="keyword">this</span>.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 继承方法</span></span><br><span class="line">SubType.prototype = <span class="keyword">new</span> SuperType() <span class="comment">// 第一次调用</span></span><br><span class="line">SubType.prototype.constructor = SubType <span class="comment">// 修改构造函数</span></span><br><span class="line">SubType.prototype.sayAge = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>.age)&#125; <span class="comment">// 添加原型方法</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> instance1 = <span class="keyword">new</span> SubType(<span class="string">'ykk'</span>, <span class="number">25</span>) </span><br><span class="line">instance1.colors.push(<span class="string">'black'</span>)</span><br><span class="line"><span class="built_in">console</span>.log(instace1.colors) <span class="comment">// ['red','green','blue', 'black']</span></span><br><span class="line">instance1.sayName() <span class="comment">// ykk</span></span><br><span class="line">instance1.sayAge() <span class="comment">// 25</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> instance2 = <span class="keyword">new</span> SubType(<span class="string">'yink'</span>, <span class="number">28</span>)</span><br><span class="line"><span class="built_in">console</span>.log(instance2.colors) <span class="comment">// ['red','green','blue']</span></span><br><span class="line">instance1.sayName() <span class="comment">// yink</span></span><br><span class="line">instance1.sayAge() <span class="comment">// 28</span></span><br></pre></td></tr></table></figure>
+
+<p>缺：会调用两次超类的构造函数，实例和原型中产生相同的超类属性，会屏蔽原型中的同名属性。</p>
+</li>
+<li><p>原型式继承：在函数类创建新对象，新对象的原型指向传入的对象，返回新对象。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">object</span> (<span class="params">o</span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">F</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function">  <span class="title">F</span>.<span class="title">prototype</span> = <span class="title">o</span></span></span><br><span class="line"><span class="function">  <span class="title">return</span> <span class="title">new</span> <span class="title">F</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>​       <code>object()</code>对传入其中的对象执行了一次浅复制，在ES5中<code>Object.create()</code>方法贵方了原型式继承</p>
+<ol start="5">
+<li><p>寄生式继承：实现原理与原型式继承紧密相关的一种思路，在封住的继承函数内创建新对象，以某种方式增强对象，然后返回<code>clone对象</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createAnother</span> (<span class="params">original</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> clone = object(original) <span class="comment">// 通过调用函数创建一个新对象</span></span><br><span class="line">  clone.sayHi = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;<span class="built_in">console</span>.log(<span class="string">'hi'</span>)&#125; <span class="comment">// 以某种方式来增强这个对象</span></span><br><span class="line">  <span class="keyword">return</span> cone  <span class="comment">// 返回这个对象</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>缺：与构造函数模式类似，由于不能做到函数复用而降低效率</p>
+</li>
+<li><p>寄生组合式继承：通过借用构造函数来继承<code>属性</code>，通过原型链的混成形式来继承<code>方法</code>。不必为了指定子类型的原型而调用超类的构造函数，我们需要的只是超类原型的一个副本。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 寄生组合式继承的基本模型 */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">inheristPrototype</span>(<span class="params">subType, superType</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> prototype = object(superType.prototype) <span class="comment">// 创建对象</span></span><br><span class="line">  prototype.constructor = subType <span class="comment">// 增强对象</span></span><br><span class="line">  subType.prototype = prototype <span class="comment">// 指定对象</span></span><br><span class="line">  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">///////</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params">name</span>) </span>&#123; <span class="comment">// 接受参数</span></span><br><span class="line">  <span class="keyword">this</span>.name = name</span><br><span class="line">  <span class="keyword">this</span>.colors = [<span class="string">'red'</span>,<span class="string">'green'</span>,<span class="string">'blue'</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">SuperType.prototype.sayName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>.name)&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span> (<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 继承属性</span></span><br><span class="line">  SuperType.call(<span class="keyword">this</span>, name) <span class="comment">// 传参 只调用一次超类的构造</span></span><br><span class="line">  <span class="keyword">this</span>.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">inheristPrototype(subType, superType) <span class="comment">// 寄生--修改原型与构造 (浅复制。子类原型引用超类原型)</span></span><br><span class="line"></span><br><span class="line">SubType.prototype.sayAge = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>.age)&#125;</span><br></pre></td></tr></table></figure>
+
+<p>优：集组合继承和寄生式继承的优点，是实现基于类型继承的最有效方式</p>
+</li>
+</ol>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://kinedyk.github.io/2019/07/02/js对象与原型链笔记/" data-id="cjy07phnl0001240bkfgsfi57" class="article-share-link">Share</a>
+      <a data-url="https://kinedyk.github.io/2019/07/02/js对象与原型链笔记/" data-id="cjymdx9ja0000xf0b1d3p14mn" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/ykk.github.io/tags/object-笔记/">object, 笔记</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/ykk.github.io/tags/笔记/">笔记</a></li></ul>
 
     </footer>
   </div>
@@ -178,7 +209,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/ykk.github.io/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/ykk.github.io/tags/object-笔记/">object, 笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/ykk.github.io/tags/sass-笔记/">sass, 笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/ykk.github.io/tags/笔记/">笔记</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/ykk.github.io/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/ykk.github.io/tags/笔记/">笔记</a></li></ul>
     </div>
   </div>
 
@@ -188,7 +219,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/ykk.github.io/tags/js/" style="font-size: 10px;">js</a> <a href="/ykk.github.io/tags/object-笔记/" style="font-size: 10px;">object, 笔记</a> <a href="/ykk.github.io/tags/sass-笔记/" style="font-size: 10px;">sass, 笔记</a> <a href="/ykk.github.io/tags/笔记/" style="font-size: 10px;">笔记</a>
+      <a href="/ykk.github.io/tags/js/" style="font-size: 10px;">js</a> <a href="/ykk.github.io/tags/笔记/" style="font-size: 20px;">笔记</a>
     </div>
   </div>
 
@@ -218,7 +249,7 @@
           </li>
         
           <li>
-            <a href="/ykk.github.io/2019/07/02/js对象与原型链笔记/">js对象与原型链笔记</a>
+            <a href="/ykk.github.io/2019/07/02/js对象与原型链笔记/">(no title)</a>
           </li>
         
           <li>
